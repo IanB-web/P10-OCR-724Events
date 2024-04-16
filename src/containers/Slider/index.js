@@ -4,21 +4,33 @@ import { getMonth } from "../../helpers/Date";
 
 import "./style.scss";
 
+
+
 const Slider = () => {
+
   const { data } = useData();
   const [index, setIndex] = useState(0);
+
   const byDateDesc = data?.focus.sort((evtA, evtB) =>
     new Date(evtA.date) < new Date(evtB.date) ? -1 : 1
   );
   const nextCard = () => {
     setTimeout(
-      () => setIndex(index < byDateDesc.length ? index + 1 : 0),
-      5000
+      // () => setIndex(index < byDateDesc.length ? index + 1 : 0),
+      // 5000
+      // DEBUG DEFILEMENT INFINI
+      // > Incrémentation de l'index de 1
+      // >> si index = byDataDesc.lenght alors on reset grace au modulo
+      // >>> reste à faire division = index du prochain slide
+     () => setIndex((index + 1) % byDateDesc.length), 5000
     );
   };
   useEffect(() => {
     nextCard();
   });
+
+
+
   return (
     <div className="SlideCardList">
       {byDateDesc?.map((event, idx) => (
@@ -45,7 +57,9 @@ const Slider = () => {
                   key={`${event.id}`}
                   type="radio"
                   name="radio-button"
-                  checked={idx === radioIdx}
+                  // checked={idx === radioIdx}
+                  // Remplacement par index, car ici idx est l'index de la boucle
+                  checked={index === radioIdx}
                 />
               ))}
             </div>
