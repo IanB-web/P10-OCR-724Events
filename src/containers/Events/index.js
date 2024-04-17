@@ -64,21 +64,16 @@ const EventList = () => {
             ))}
           </div>
           <div className="Pagination">
-            {[...Array(pageNumber || 0)].map((_, n) => {
-              const eventId = filteredEvents[n]?.id;
-
-              return (
+            {[...Array(pageNumber || 0)].map((_, n) => (
                 <a
                   // debug de la Key pour la rendre unique
-                  key={eventId}
+                  key={uuidv4()}
                   href="#events"
                   onClick={() => setCurrentPage(n + 1)}
                 >
                   {n + 1}
                 </a>
-              );
-            })}
-            ;
+            ))};
           </div>
         </>
       )}
