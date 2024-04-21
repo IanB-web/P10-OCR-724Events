@@ -18,7 +18,10 @@ const Page = () => {
   // On récupère d'abord la data puis on la trie pour détermliner la "last"
   const { data } = useData();
 
-  const last = data && data.events && data.events.lenght > 0 ? data.events[data.events.lenght - 1] : null;
+  const last = data?.events
+  .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  .slice(0,1)[0];
+  ;
 
   return <>
     <header>
@@ -123,7 +126,7 @@ const Page = () => {
       <div className="col presta">
         <h3>Notre derniére prestation</h3>
         {/* On rajoute les paramètres pour le débug + alt pour l'image */}
-        {last && ( 
+        {last ? (
           <EventCard
             imageSrc={last.cover}
             imageAlt={last.description}
@@ -132,7 +135,7 @@ const Page = () => {
             small
             label={last.type}
           />
-        )}
+        ) : (<div>Chargement ou aucune donnée à afficher...</div>)}
       </div>
       <div className="col contact">
         <h3>Contactez-nous</h3>
