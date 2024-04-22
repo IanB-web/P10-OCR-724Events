@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import Field, { FIELD_TYPES } from "../../components/Field";
 import Select from "../../components/Select";
@@ -13,46 +13,107 @@ const mockContactApi = () =>
 const Form = ({ onSuccess, onError }) => {
   const [sending, setSending] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    firstName: "",
+    type: "",
+    email: "",
+    message: "",
+  });
+
+  /**
+   * Vérifier si tous les champs requis sont remplis
+   */
+  const validateForm = () =>
+    formData.name !== "" &&
+    formData.firstName !== "" &&
+    formData.type !== "" &&
+    formData.email !== "" &&
+    formData.message !== "";
 
   const sendContact = useCallback(
     async (evt) => {
       evt.preventDefault();
+      // Vérifier la validation du formulaire
+      if (!validateForm()) {
+        // Si le formulaire n'est pas valide, on ne continue pas mais on affiche un message d'alerte
+        alert("Veuillez remplir tous les champs du formulaire.");
+        return;
+      }
+
       setSending(true);
       // We try to call mockContactApi
       try {
         await mockContactApi();
         setSending(false);
         setShowConfirmation(true);
+        onSuccess();
+        // Réinitialiser les champs du formulaire après un certain délai
+        setTimeout(() => {
+          setShowConfirmation(false);
+          setFormData({
+            name: "",
+            firstName: "",
+            type: "",
+            email: "",
+            message: "",
+          });
+          // Appeler onSuccess si besoin
+        }, 3000); // 3000ms = 3 secondes
       } catch (err) {
         setSending(false);
         onError(err);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError, formData]
   );
 
   return (
-    // Ajout d'une condition pour afficher le message de confirmation + ajout du requis pour le form
-    <form onSubmit={sendContact} required>
+    <form onSubmit={sendContact}>
       {showConfirmation ? (
-        <div className="message__cont">
-          <p className="message__text">Votre message a bien été envoyé !</p>
+        <div className="row">
+          <div className="col">
+            <p>Votre message a été envoyé avec succès !</p>
+          </div>
         </div>
       ) : (
         <div className="row">
           <div className="col">
-            <Field placeholder="" label="Nom" required />
-            <Field placeholder="" label="Prénom" required />
+            <Field
+              placeholder=""
+              label="Nom"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+            />
+            <Field
+              placeholder=""
+              label="Prénom"
+              value={formData.firstName}
+              onChange={(e) =>
+                setFormData({ ...formData, firstName: e.target.value })
+              }
+            />
             <Select
-              selection={["Personel", "Entreprise"]}
-              onChange={() => null}
-              label="Personel / Entreprise"
+              selection={["Personnel", "Entreprise"]}
+              label="Personnel / Entreprise"
+              value={formData.type}
+              onChange={(newValue) =>
+                setFormData({ ...formData, type: newValue })
+              }
               type="large"
               titleEmpty
             />
-            <Field placeholder="" label="Email" required />
-            {/* Ajout d'une redirection vers onSuccess() */}
-            <Button type={BUTTON_TYPES.SUBMIT} disabled={sending} onClick={() => onSuccess()}>
+            <Field
+              placeholder=""
+              label="Email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+            />
+            <Button type={BUTTON_TYPES.SUBMIT} disabled={sending}>
               {sending ? "En cours" : "Envoyer"}
             </Button>
           </div>
@@ -61,7 +122,10 @@ const Form = ({ onSuccess, onError }) => {
               placeholder="message"
               label="Message"
               type={FIELD_TYPES.TEXTAREA}
-              required
+              value={formData.message}
+              onChange={(e) =>
+                setFormData({ ...formData, message: e.target.value })
+              }
             />
           </div>
         </div>
