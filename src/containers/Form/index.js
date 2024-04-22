@@ -37,6 +37,7 @@ const Form = ({ onSuccess, onError }) => {
       // Vérifier la validation du formulaire
       if (!validateForm()) {
         // Si le formulaire n'est pas valide, on ne continue pas mais on affiche un message d'alerte
+        // eslint-disable-next-line
         alert("Veuillez remplir tous les champs du formulaire.");
         return;
       }
